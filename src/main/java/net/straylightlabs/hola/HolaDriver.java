@@ -34,7 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -46,11 +49,13 @@ public class HolaDriver {
 
     public static void main(String[] args) {
         try {
-            Service service = Service.fromName("_tivo-mindrpc._tcp");
-//            Service service = Service.fromName("_appletv-v2._tcp");
-//            Service service = Service.fromName("_airport._tcp");
+            Service service = Service.fromName("_ortho._udp");
+            byte[] ipAddress = new byte[4];
+            ipAddress[0] = (byte) 192; ipAddress[1] = (byte) 168; ipAddress[2] = (byte) 31; ipAddress[3] = (byte) 56;
+            InetAddress addr = Inet4Address.getByAddress(ipAddress);
+
             Query query = Query.createFor(service, Domain.LOCAL);
-            Set<Instance> instances = query.runOnce();
+            Set<Instance> instances = query.runOnceOn(addr);
             instances.stream().forEach(System.out::println);
             if (instances.size() == 0) {
                 logger.error("No instances of type {} found :(", service);
